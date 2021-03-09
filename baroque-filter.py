@@ -5,7 +5,7 @@ from shutil import copyfile
 
 # dataset indir and outdir
 indir = os.path.join('dataset', 'painter-by-numbers')
-outdir = os.path.join('dataset', 'baroque-painters')
+outdir = os.path.join('dataset', 'painter-from-baroque')
 
 # csv file
 infile = os.path.join(indir, 'all_data_info.csv')
@@ -92,31 +92,9 @@ def extract_painters(df):
     df_painters = df[['artist', 'style', 'genre', 'new_filename']]
 
     # aggregate for 'artist' by the total count of the paintings
-    # df_painters = df_painters.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts',ascending=False)
+    df_painters = df_painters.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts',ascending=False)
 
-    # print(df_painters)
-
-    for index, row in df_painters.iterrows():
-
-        artist = row['artist']
-        fn = row['new_filename']
-
-        full_fn = os.path.join(outdir, fn)
-
-        if os.path.exists(full_fn):
-            pass
-        else:
-            print(fn, 'does not exist yet!')
-
-            src = os.path.join(indir, 'train', fn)
-            dst = os.path.join(outdir, fn)
-
-            try:
-                copyfile(src, dst)
-            except:
-                src = os.path.join(indir, 'test', fn)
-                copyfile(src, dst)
-
+    print(df_painters)
 
 
 if __name__ == '__main__':
