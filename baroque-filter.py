@@ -4,10 +4,10 @@ from shutil import copyfile
 
 
 # csv file
-infile = os.path.join('dataset', 'all_data_info.csv')
+infile = os.path.join('dataset', 'painter-by-numbers', 'all_data_info.csv')
 
 # dataset indir and outdir
-outdir = os.path.join('dataset', 'baroque')
+outdir = os.path.join('dataset', 'baroque-painters')
 indir = os.path.join('dataset', 'painter-by-numbers')
 
 
@@ -56,16 +56,33 @@ def create_dataset(df, indir, outdir):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    for group, fn in df[['artist_group', 'new_filename']]:
+    for index, row in df[['artist_group', 'new_filename']].iterrows():
+
+        group = row['artist_group']
+        fn = row['new_filename']
+
+        print(group, fn)
 
         if group.find('train') != -1:
+            # train images are from the 'train' folder; but sometimes it is put in the 'test' folder, given 'artist_group' == 'train_and_test'.
             src = os.path.join(indir, 'train', fn)
             dst = os.path.join(outdir, fn)
-            copyfile(src, dst)
+
+            try:
+                copyfile(src, dst)
+            except:
+                src = os.path.join(indir, 'test', fn)
+                copyfile(src, dst)
         else:
+            # test images are from the 'test' folder; images are not duplicate in 'train' and 'test' folders.
             src = os.path.join(indir, 'test', fn)
             dst = os.path.join(outdir, fn)
-            copyfile(src, dst)
+
+            try:
+                copyfile(src, dst)
+            except:
+                src = os.path.join(indir, 'train', fn)
+                copyfile(src, dst)
 
 
 if __name__ == '__main__':
