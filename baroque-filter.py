@@ -5,7 +5,8 @@ from shutil import copyfile
 
 # dataset indir and outdir
 indir = os.path.join('dataset', 'painter-by-numbers')
-outdir = os.path.join('dataset', 'painter-from-baroque')
+outdir_baroque = os.path.join('dataset', 'painter-of-baroque')
+outdir_nude = os.path.join('dataset', 'painter-of-nude')
 
 # csv file
 infile = os.path.join(indir, 'all_data_info.csv')
@@ -22,12 +23,21 @@ def extract_date(df, col):
     return df
 
 
-def read_csv(infile):
+def extract_painters(df):
+
+    df_painters = df[['artist', 'style', 'genre', 'new_filename']]
+
+    # aggregate for 'artist' by the total count of the paintings
+    df_painters = df_painters.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts',ascending=False)
+
+    # print all the rows
+    pd.set_option('display.max_rows', df_painters.shape[0] + 1)
+    print(df_painters)
+
+
+def filter_baroque(infile):
 
     df = pd.read_csv(infile)
-
-    # index
-    df.set_index('date')
 
     # filter columns
     df_baroque = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
@@ -49,7 +59,43 @@ def read_csv(infile):
     # is_caravaggio = df_baroque['artist'] == 'Caravaggio'
     # df_caravaggio = df_baroque[is_caravaggio]
 
+    extract_painters(df_baroque)
+
     return df_baroque
+
+
+def filter_nude(infile):
+
+    df = pd.read_csv(infile)
+
+    # filter columns
+    df_nude = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
+
+    # filter by 'genre'
+    is_nude = df_nude['genre'] == 'nude painting (nu)'
+    df_nude = df_nude[is_nude]
+
+    # filter by 'style' == 'Baroque'
+    # is_baroque = df_nude['style'] == 'Baroque'
+    # df_nude = df_nude[is_baroque]
+
+    extract_painters(df_nude)
+
+    return df_nude
+
+
+def analyze_statistics(infile, col):
+
+    df = pd.read_csv(infile)
+
+    # filter columns
+    df = df[['artist', 'date', 'genre', 'style', 'new_filename']]
+
+    # statistics for desired column
+    df = df.groupby([col]).size().reset_index(name='counts').sort_values(by='counts', ascending=False)
+
+    pd.set_option('display.max_rows', df.shape[0] + 1)
+    print(df)
 
 
 def create_dataset(df, indir, outdir):
@@ -87,23 +133,16 @@ def create_dataset(df, indir, outdir):
                 copyfile(src, dst)
 
 
-def extract_painters(df):
-
-    df_painters = df[['artist', 'style', 'genre', 'new_filename']]
-
-    # aggregate for 'artist' by the total count of the paintings
-    df_painters = df_painters.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts',ascending=False)
-
-    print(df_painters)
-
-
 if __name__ == '__main__':
 
     # filter the painters during the Baroque period
-    df = read_csv(infile)
+    # df = filter_baroque(infile=infile)
+    # create_dataset(df, indir=indir, outdir=outdir_baroque)
 
-    # create the dataset
-    # create_dataset(df, indir=indir, outdir=outdir)
+    # analyze statistics of dataset
+    # analyze_statistics(infile, 'style')
+    # analyze_statistics(infile, 'genre')
 
-    # print the painters during the Baroque period
-    extract_painters(df=df)
+    # filter the painters for nude paintings
+    df = filter_nude(infile=infile)
+    # create_dataset(df, indir=indir, outdir=outdir_nude)
