@@ -3,12 +3,12 @@ import os
 from shutil import copyfile
 
 
-# csv file
-infile = os.path.join('dataset', 'painter-by-numbers', 'all_data_info.csv')
-
 # dataset indir and outdir
-outdir = os.path.join('dataset', 'baroque-painters')
 indir = os.path.join('dataset', 'painter-by-numbers')
+outdir = os.path.join('dataset', 'baroque-painters')
+
+# csv file
+infile = os.path.join(indir, 'all_data_info.csv')
 
 
 def extract_date(df, col):
@@ -32,18 +32,20 @@ def read_csv(infile):
     # filter columns
     df_baroque = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
 
-    # convert 'date' column to numeric
-    df_baroque = extract_date(df_baroque, 'date')
+    # filter by 'date'
+    # df_baroque = extract_date(df_baroque, 'date')
 
-    # filter conditions
-    is_baroque_start = df_baroque['date'] > 1580
-    is_baroque_end = df_baroque['date'] < 1750
+    # is_baroque_start = df_baroque['date'] > 1580
+    # is_baroque_end = df_baroque['date'] < 1750
 
-    # filter rows
-    df_baroque = df_baroque[is_baroque_start]
-    df_baroque = df_baroque[is_baroque_end]
+    # df_baroque = df_baroque[is_baroque_start]
+    # df_baroque = df_baroque[is_baroque_end]
 
-    # filter caravaggio
+    # filter by 'style'
+    is_baroque = df_baroque['style'] == 'Baroque'
+    df_baroque = df_baroque[is_baroque]
+
+    # filter by 'artist' == caravaggio
     # is_caravaggio = df_baroque['artist'] == 'Caravaggio'
     # df_caravaggio = df_baroque[is_caravaggio]
 
@@ -85,10 +87,45 @@ def create_dataset(df, indir, outdir):
                 copyfile(src, dst)
 
 
+def extract_painters(df):
+
+    df_painters = df[['artist', 'style', 'genre', 'new_filename']]
+
+    # aggregate for 'artist' by the total count of the paintings
+    # df_painters = df_painters.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts',ascending=False)
+
+    # print(df_painters)
+
+    for index, row in df_painters.iterrows():
+
+        artist = row['artist']
+        fn = row['new_filename']
+
+        full_fn = os.path.join(outdir, fn)
+
+        if os.path.exists(full_fn):
+            pass
+        else:
+            print(fn, 'does not exist yet!')
+
+            src = os.path.join(indir, 'train', fn)
+            dst = os.path.join(outdir, fn)
+
+            try:
+                copyfile(src, dst)
+            except:
+                src = os.path.join(indir, 'test', fn)
+                copyfile(src, dst)
+
+
+
 if __name__ == '__main__':
 
     # filter the painters during the Baroque period
     df = read_csv(infile)
 
     # create the dataset
-    create_dataset(df, indir=indir, outdir=outdir)
+    # create_dataset(df, indir=indir, outdir=outdir)
+
+    # print the painters during the Baroque period
+    extract_painters(df=df)
