@@ -3,7 +3,7 @@
 ## Dataset analysis
 
 <p float="left">
-    <img src="./pix/top-21-styles.png" width=800 />
+    <img src="./pix/top-21-styles.png" width=900 />
 </p>
 
 ## References
