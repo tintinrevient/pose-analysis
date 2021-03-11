@@ -1,10 +1,17 @@
 # Pose Analysis
 
-## Dataset analysis
+## Style over history
 
 <p float="left">
     <img src="./pix/top-21-styles.png" width=900 />
 </p>
+
+## Nude paintings over style
+
+<p float="left">
+    <img src="./pix/top-14-styles-of-nu.png" width=600 />
+</p>
+
 
 ## References
 * https://kanoki.org/2019/11/12/how-to-use-regex-in-pandas/
