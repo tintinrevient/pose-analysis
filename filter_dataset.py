@@ -13,6 +13,13 @@ outdir_nude = os.path.join('dataset', 'painter-of-nude')
 # csv file
 infile = os.path.join(indir, 'all_data_info.csv')
 
+# pix file
+outfile_timeline_style = os.path.join('pix', 'timeline-top-21-styles.png')
+outfile_timeline_nu_artist = os.path.join('pix', 'timeline-top-26-nu-artists.png')
+
+outfile_pie_style = os.path.join('pix', 'pie-top-16-styles-of-nu.png')
+outfile_vstack_style = os.path.join('pix', 'vstack-top-16-styles-of-nu.png')
+
 
 def convert_date_to_numeric(df):
 
@@ -22,10 +29,12 @@ def convert_date_to_numeric(df):
     # convert to numeric
     df['date'] = pd.to_numeric(df['date'])
 
+    # df.loc[pd.isna(df['date']), 'date'] = 0
+
     return df
 
 
-def group_by_col(df, is_grouped_by_artist=False, is_grouped_by_style=False, is_grouped_by_genre=False, show_all=False):
+def group_by_colname(df, is_grouped_by_artist=False, is_grouped_by_style=False, is_grouped_by_genre=False, show_all=False):
 
     df = df[['artist', 'style', 'genre', 'new_filename']]
 
@@ -70,49 +79,19 @@ def group_by_col(df, is_grouped_by_artist=False, is_grouped_by_style=False, is_g
 
 def combine_same_styles(df):
 
-    # Romanticism
-    df_romanticism = df[df['style'].str.contains('Romanticism', case=False)]
-    for style in df_romanticism['style'].tolist():
-        df.drop(df[df['style'] == style].index, inplace=True)
-    df.loc[df.index.max() + 1] = ['Romanticism'] + list([df_romanticism.sum().loc['counts']])
-
-    # Expressionism
-    df_expressionism = df[df['style'].str.contains('Expressionism', case=False)]
-    for style in df_expressionism['style'].tolist():
-        df.drop(df[df['style'] == style].index, inplace=True)
-    df.loc[df.index.max() + 1] = ['Expressionism'] + list([df_expressionism.sum().loc['counts']])
-
-    print(df_expressionism)
-
-    # Impressionism
+    # Impressionism = Impressionism + Post-Impressionism
     df_impressionism = df[df['style'].str.contains('Impressionism', case=False)]
     for style in df_impressionism['style'].tolist():
         df.drop(df[df['style'] == style].index, inplace=True)
     df.loc[df.index.max() + 1] = ['Impressionism'] + list([df_impressionism.sum().loc['counts']])
+    print(df_impressionism)
 
-    # Renaissance
+    # Renaissance = Early Renaissance + Northern Renaissance + High Renaissance + Mannerism (Late Renaissance)
     df_renaissance = df[df['style'].str.contains('Renaissance', case=False)]
     for style in df_renaissance['style'].tolist():
         df.drop(df[df['style'] == style].index, inplace=True)
     df.loc[df.index.max() + 1] = ['Renaissance'] + list([df_renaissance.sum().loc['counts']])
-
-    # Baroque
-    df_baroque = df[df['style'].str.contains('Baroque', case=False)]
-    for style in df_baroque['style'].tolist():
-        df.drop(df[df['style'] == style].index, inplace=True)
-    df.loc[df.index.max() + 1] = ['Baroque'] + list([df_baroque.sum().loc['counts']])
-
-    # Realism
-    df_realism = df[df['style'].str.contains('Realism', case=False)]
-    for style in df_realism['style'].tolist():
-        df.drop(df[df['style'] == style].index, inplace=True)
-    df.loc[df.index.max() + 1] = ['Realism'] + list([df_realism.sum().loc['counts']])
-
-    # Cubism
-    df_cubism = df[df['style'].str.contains('Cubism', case=False)]
-    for style in df_cubism['style'].tolist():
-        df.drop(df[df['style'] == style].index, inplace=True)
-    df.loc[df.index.max() + 1] = ['Cubism'] + list([df_cubism.sum().loc['counts']])
+    print(df_renaissance)
 
     return df
 
@@ -145,7 +124,7 @@ def filter_baroque(infile, is_grouped_by_artist=False, is_grouped_by_style=False
     # is_nude = df_baroque['genre'] == 'nude painting (nu)'
     # df_baroque = df_baroque[is_nude]
 
-    df_group = group_by_col(df_baroque, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
+    df_group = group_by_colname(df_baroque, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
 
     return df_baroque, df_group
 
@@ -165,7 +144,7 @@ def filter_nude(infile, is_grouped_by_artist=False, is_grouped_by_style=False, i
     # is_baroque = df_nude['style'] == 'Baroque'
     # df_nude = df_nude[is_baroque]
 
-    df_group = group_by_col(df_nude, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
+    df_group = group_by_colname(df_nude, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
 
     return df_nude, df_group
 
@@ -174,66 +153,122 @@ def filter_top_style_ordered_by_date(infile):
 
     df = pd.read_csv(infile)
 
-    # filter columns
-    df = df[['artist', 'date', 'genre', 'style', 'new_filename']]
-
     # convert date to numeric
     df = convert_date_to_numeric(df)
+
+    # aggregate 'df' -> 'df_date': mean of date -> date
+    df_date = df.groupby(['style']).agg({'date': 'mean'}).reset_index()[['style', 'date']].sort_values(by='date',
+                                                                                                  ascending=True)
+    # 'df': select columns
+    df = df[['style', 'new_filename']]
 
     # filter 'df' -> 'df_style_count': style + count
     df_style_count = df.groupby(['style']).size().reset_index(name='counts').sort_values(by='counts', ascending=False)
 
-    # combine same styles into one row
-    # df_style_count = combine_same_styles(df_style_count)
-
     # filter 'df_style_count' -> 'df_top_style_count': counts > 1000
     df_top_style_count = df_style_count[df_style_count['counts'] > 1000]
 
-    print(df_top_style_count)
-
-    # filter 'df': style in 'df_top_style_count'
-    is_style = df['style'].apply(lambda x: True if x in df_top_style_count['style'].unique().tolist() else False)
-    df = df[is_style]
-
-    # aggregate 'df' by date: mean of date -> date
-    df = df.groupby(['style']).agg({'date': 'mean'}).reset_index()[['style', 'date']].sort_values(by='date', ascending=True)
+    # filter 'df_date': style in 'df_top_style_count'
+    is_style = df_date['style'].apply(lambda x: True if x in df_top_style_count['style'].unique().tolist() else False)
+    df_date = df_date[is_style]
 
     # add 'counts' in 'df': from 'df_top_style_count'
-    df['counts'] = [df_top_style_count[df_top_style_count['style']==style]['counts'].values[0] for style in df['style'].tolist()]
+    df_date['counts'] = [df_top_style_count[df_top_style_count['style']==style]['counts'].values[0] for style in df_date['style'].tolist()]
 
-    pd.set_option('display.max_rows', df.shape[0] + 1)
-    print(df)
+    pd.set_option('display.max_rows', df_date.shape[0] + 1)
+    print(df_date)
+
+    return df_date
+
+
+def filter_top_artist_of_nu_ordered_by_date(infile):
+
+    df = pd.read_csv(infile)
+
+    # convert date to numeric
+    df = convert_date_to_numeric(df)
+
+    # aggregate 'df' -> 'df_date': mean of date -> date
+    df_date = df.groupby(['artist']).agg({'date': 'mean'}).reset_index()[['artist', 'date']].sort_values(by='date', ascending=True)
+
+    # 'df': select artists with nude paintings
+    df = df[df['genre'] == 'nude painting (nu)'][['artist', 'new_filename']]
+
+    # filter 'df' -> 'df_artist_count': artist + count
+    df_artist_count = df.groupby(['artist']).size().reset_index(name='counts').sort_values(by='counts', ascending=False)
+
+    # filter 'df_artist_count' -> 'df_top_artist_count': counts > 15
+    df_top_artist_count = df_artist_count[df_artist_count['counts'] > 15]
+
+    # filter 'df_date': artist in 'df_top_artist_count'
+    is_artist = df_date['artist'].apply(lambda x: True if x in df_top_artist_count['artist'].unique().tolist() else False)
+    df_date = df_date[is_artist]
+
+    # add 'counts' in 'df': from 'df_top_artist_count'
+    df_date['counts'] = [df_top_artist_count[df_top_artist_count['artist']==artist]['counts'].values[0] for artist in df_date['artist'].tolist()]
+
+    pd.set_option('display.max_rows', df_date.shape[0] + 1)
+    print(df_date)
+
+    return df_date
+
+
+def filter_combined_styles(df):
+
+    df = combine_same_styles(df)
+
+    # filter by: counts > 30
+    df = df[df['counts'] > 30]
+    df = df.sort_values(by='counts', ascending=False)
 
     return df
 
 
-def plot_stacked_bar_chart(df):
+def plot_stacked_bar_chart(df, colname, outfile, is_hstack=True):
 
-    style_names = df['style'].tolist()
-    results = {'Style': df['counts'].tolist()}
+    style_names = df[colname].tolist()
+    results = {colname: df['counts'].tolist()}
 
     labels = list(results.keys())
     data = np.array(list(results.values()))
     data_cum = data.cumsum(axis=1)
     style_colors = plt.get_cmap('rainbow')(np.linspace(0.15, 0.85, data.shape[1])) # cmap = RdYlGn or rainbow
 
-    fig, ax = plt.subplots(figsize=(9.2, 5))
-    ax.invert_yaxis()
-    ax.xaxis.set_visible(False)
-    ax.set_xlim(0, np.sum(data, axis=1).max())
+    if is_hstack:
+        fig, ax = plt.subplots(figsize=(9.2, 5))
+        ax.invert_yaxis()
+        ax.xaxis.set_visible(False)
+        ax.set_xlim(0, np.sum(data, axis=1).max())
+    else:
+        fig, ax = plt.subplots(figsize=(5, 9.2))
+        ax.yaxis.set_visible(False)
+        ax.set_ylim(0, np.sum(data, axis=1).max())
 
     for i, (colname, color) in enumerate(zip(style_names, style_colors)):
-        widths = data[:, i]
-        starts = data_cum[:, i] - widths
-        ax.barh(labels, widths, left=starts, height=0.5, label=colname, color=color)
-        xcenters = starts + widths / 2
+        if is_hstack:
+            widths = data[:, i]
+            starts = data_cum[:, i] - widths
+            ax.barh(labels, width=widths, left=starts, height=0.5, label=colname, color=color)
+            xcenters = starts + widths / 2
+        else:
+            heights = data[:, i]
+            starts = data_cum[:, i] - heights
+            ax.bar(labels, height=heights, bottom=starts, width=0.2, label=colname, color=color)
+            xcenters = starts + heights / 2
 
         r, g, b, _ = color
         text_color = 'white' if r * g * b < 0.5 else 'darkgrey'
-        for y, (x, c) in enumerate(zip(xcenters, widths)):
-            ax.text(x, y, str(int(c)), ha='center', va='center', color=text_color, rotation=90)
+        if is_hstack:
+            for y, (x, c) in enumerate(zip(xcenters, widths)):
+                ax.text(x, y, str(int(c)), ha='center', va='center', color=text_color, rotation=90)
+        else:
+            for x, (y, c) in enumerate(zip(xcenters, heights)):
+                ax.text(x, y, str(int(c)), ha='center', va='center', color=text_color)
 
-    ax.legend(ncol=3, loc='upper right', fontsize='small')
+    if is_hstack:
+        ax.legend(ncol=3, loc='upper right', fontsize='small')
+    else:
+        ax.legend(ncol=1, loc='upper right', fontsize='small')
 
     # save the plot
     plt.gca().set_axis_off()
@@ -241,19 +276,13 @@ def plot_stacked_bar_chart(df):
     plt.margins(0, 0)
     plt.gca().xaxis.set_major_locator(plt.NullLocator())
     plt.gca().yaxis.set_major_locator(plt.NullLocator())
-    plt.savefig(os.path.join('pix', 'top-21-styles.png'), bbox_inches='tight', pad_inches=0)
+    plt.savefig(outfile, bbox_inches='tight', pad_inches=0)
 
     # show the plot
     # plt.show()
 
 
-def plot_pie_chart(df):
-
-    df = combine_same_styles(df)
-
-    # filter by: counts > 30
-    df = df[df['counts'] > 30]
-    df = df.sort_values(by='counts', ascending=False)
+def plot_pie_chart(df, outfile):
 
     labels = df['style'].tolist()
     sizes = df['counts'].tolist()
@@ -272,33 +301,43 @@ def plot_pie_chart(df):
     plt.margins(0, 0)
     plt.gca().xaxis.set_major_locator(plt.NullLocator())
     plt.gca().yaxis.set_major_locator(plt.NullLocator())
-    plt.savefig(os.path.join('pix', 'top-14-styles-of-nu.png'), bbox_inches='tight', pad_inches=0)
+    plt.savefig(outfile, bbox_inches='tight', pad_inches=0)
 
     # show the plot
     # plt.show()
 
 
-def analyze_statistics(infile, col, is_grouped_by_date=False, is_ascending=False, is_displayed=True):
+def analyze_style_and_genre(infile, styles, genre, by_date=False):
 
     df = pd.read_csv(infile)
 
-    # filter columns
-    df = df[['artist', 'date', 'genre', 'style', 'new_filename']]
+    # filter by style and genre
+    df = df[df['style'].isin(styles)][['artist', 'date', 'genre', 'style', 'new_filename']]
+    df = df[df['genre'] == genre][['artist', 'date', 'genre', 'style', 'new_filename']]
 
-    # convert date to numeric
-    df = convert_date_to_numeric(df)
-
-    # statistics for desired column
-    if is_grouped_by_date:
-        df = df.groupby([col, 'date']).size().reset_index(name='counts').sort_values(by='date', ascending=is_ascending)
+    if by_date:
+        df = convert_date_to_numeric(df)
+        df = df.groupby(['style']).agg({'date': 'mean'}).reset_index()[['style', 'date']].sort_values(by='date', ascending=True)
     else:
-        df = df.groupby([col]).size().reset_index(name='counts').sort_values(by='counts', ascending=is_ascending)
+        df = df.groupby(['style', 'genre', 'artist']).size().reset_index(name='counts').sort_values(by='style', ascending=False)
+        df = df[df['counts'] >= 10][['style', 'artist', 'counts']]
 
-    if is_displayed:
-        pd.set_option('display.max_rows', df.shape[0] + 1)
-        print(df)
+    pd.set_option('display.max_rows', df.shape[0] + 1)
+    print(df)
 
-    return df
+
+def analyze_artist(infile, artist, genre):
+
+    df = pd.read_csv(infile)
+
+    # filter artist
+    df = df[df['artist'] == artist][['artist', 'date', 'genre', 'style', 'new_filename']]
+    df = df[df['genre'] == genre][['artist', 'date', 'genre', 'style', 'new_filename']]
+
+    df = df.groupby(['genre', 'style']).size().reset_index(name='counts').sort_values(by='counts', ascending=False)
+
+    pd.set_option('display.max_rows', df.shape[0] + 1)
+    print(df)
 
 
 def create_dataset(df, indir, outdir):
@@ -355,9 +394,16 @@ def create_painter_dir(df, indir):
 
 if __name__ == '__main__':
 
-    # analyze statistics of dataset
-    # df = analyze_statistics(infile, col='style', is_grouped_by_date=False, is_ascending=True)
-    # analyze_statistics(infile, col='genre')
+    # analyze statistics of style and genre
+    # analyze_style_and_genre(infile, styles=['Impressionism', 'Post-Impressionism'], genre='nude painting (nu)', by_date=True)
+    # analyze_style_and_genre(infile,
+    #                         styles = ['Neoclassicism', 'Romanticism', 'Realism', 'Baroque',
+    #                                   'Expressionism', 'Impressionism', 'Post-Impressionism', 'High Renaissance',
+    #                                   'Northern Renaissance', 'Mannerism (Late Renaissance)', 'Early Renaissance'],
+    #                         genre='nude painting (nu)')
+
+    # analyze statistics of artist
+    # analyze_artist(infile, artist='Pablo Picasso', genre='nude painting (nu)')
 
     # filter the painters during the Baroque period
     # df = filter_baroque(infile=infile, is_grouped_by_artist=True, is_grouped_by_genre=False, show_all=False)
@@ -371,8 +417,14 @@ if __name__ == '__main__':
 
     # plot the stacked bar chart for styles: (counts of styles > 1000) ordered by date
     # df = filter_top_style_ordered_by_date(infile)
-    # plot_stacked_bar_chart(df)
+    # plot_stacked_bar_chart(df, colname='style', outfile = outfile_timeline_style)
+
+    # plot the stacked bar chart for artists of nude paintings: (counts of artists > 15) ordered by date
+    # df = filter_top_artist_of_nu_ordered_by_date(infile)
+    # plot_stacked_bar_chart(df, colname='artist', outfile = outfile_timeline_nu_artist)
 
     # plot the pie chart for the nude paintings grouped by styles
     _, df = filter_nude(infile=infile, is_grouped_by_artist=False, is_grouped_by_style=True)
-    plot_pie_chart(df)
+    df = filter_combined_styles(df)
+    plot_stacked_bar_chart(df, colname='style', outfile=outfile_vstack_style, is_hstack=False)
+    # plot_pie_chart(df, outfile=outfile_pie_style)
