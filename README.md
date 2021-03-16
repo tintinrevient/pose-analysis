@@ -24,3 +24,9 @@
 * https://www.kaggle.com/akshaysehgal/how-to-group-by-aggregate-using-py
 * https://matplotlib.org/stable/gallery/lines_bars_and_markers/horizontal_barchart_distribution.html
 * https://towardsdatascience.com/data-science-with-python-intro-to-loading-and-subsetting-data-with-pandas-9f26895ddd7f
+* https://github.com/facebookresearch/detectron2/issues/300
+* https://github.com/facebookresearch/detectron2/blob/master/GETTING_STARTED.md#inference-with-pre-trained-models
+* https://kegui.medium.com/how-do-i-know-i-am-running-keras-model-on-gpu-a9cdcc24f986
+* https://detectron2.readthedocs.io/en/latest/tutorials/models.html
+* https://detectron2.readthedocs.io/en/latest/notes/benchmarks.html
+* https://dbcollection.readthedocs.io/en/latest/datasets/flic.html
