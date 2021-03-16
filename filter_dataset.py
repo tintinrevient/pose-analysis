@@ -96,57 +96,38 @@ def combine_same_styles(df):
     return df
 
 
-def filter_baroque(infile, is_grouped_by_artist=False, is_grouped_by_style=False, is_grouped_by_genre=False, show_all=False):
+def filter_style_genre_artist(infile, artist_list, style, genre, is_grouped_by_artist=False, is_grouped_by_style=False, is_grouped_by_genre=False, show_all=False):
 
     df = pd.read_csv(infile)
 
     # filter columns
-    df_baroque = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
+    df = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
 
-    # filter by 'date'
-    # df_baroque = convert_date_to_numeric(df_baroque)
+    if style and genre and artist_list:
+        df = df[df['style'] == style]
+        df = df[df['genre'] == genre]
+        df = df[df['artist'].isin(artist_list)]
+    elif style and genre:
+        df = df[df['style'] == style]
+        df = df[df['genre'] == genre]
+    elif style and artist_list:
+        df = df[df['style'] == style]
+        df = df[df['artist'].isin(artist_list)]
+    elif genre and artist_list:
+        df = df[df['genre'] == genre]
+        df = df[df['artist'].isin(artist_list)]
+    elif style:
+        df = df[df['style'] == style]
+    elif genre:
+        df = df[df['genre'] == genre]
+    elif artist_list:
+        df = df[df['artist'].isin(artist_list)]
+    else:
+        pass
 
-    # is_baroque_start = df_baroque['date'] > 1580
-    # is_baroque_end = df_baroque['date'] < 1750
+    df_group = group_by_colname(df, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
 
-    # df_baroque = df_baroque[is_baroque_start]
-    # df_baroque = df_baroque[is_baroque_end]
-
-    # filter by 'style'
-    is_baroque = df_baroque['style'] == 'Baroque'
-    df_baroque = df_baroque[is_baroque]
-
-    # filter by 'artist' == caravaggio
-    # is_caravaggio = df_baroque['artist'] == 'Caravaggio'
-    # df_caravaggio = df_baroque[is_caravaggio]
-
-    # filter by 'genre' == 'nude painting (nu)'
-    # is_nude = df_baroque['genre'] == 'nude painting (nu)'
-    # df_baroque = df_baroque[is_nude]
-
-    df_group = group_by_colname(df_baroque, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
-
-    return df_baroque, df_group
-
-
-def filter_nude(infile, is_grouped_by_artist=False, is_grouped_by_style=False, is_grouped_by_genre=False, show_all=False):
-
-    df = pd.read_csv(infile)
-
-    # filter columns
-    df_nude = df[['artist', 'date', 'genre', 'style', 'artist_group', 'new_filename']]
-
-    # filter by 'genre'
-    is_nude = df_nude['genre'] == 'nude painting (nu)'
-    df_nude = df_nude[is_nude]
-
-    # filter by 'style' == 'Baroque'
-    # is_baroque = df_nude['style'] == 'Baroque'
-    # df_nude = df_nude[is_baroque]
-
-    df_group = group_by_colname(df_nude, is_grouped_by_artist, is_grouped_by_style, is_grouped_by_genre, show_all)
-
-    return df_nude, df_group
+    return df, df_group
 
 
 def filter_top_style_ordered_by_date(infile):
@@ -399,19 +380,23 @@ if __name__ == '__main__':
     # analyze_style_and_genre(infile,
     #                         styles = ['Neoclassicism', 'Romanticism', 'Realism', 'Baroque',
     #                                   'Expressionism', 'Impressionism', 'Post-Impressionism', 'High Renaissance',
-    #                                   'Northern Renaissance', 'Mannerism (Late Renaissance)', 'Early Renaissance'],
+    #                                   'Northern Renaissance', 'Mannerism (Late Renaissance)', 'Early Renaissance',
+    #                                   'Cubism', 'Art Nouveau (Modern)', 'Surrealism', 'Symbolism', 'Art Deco',
+    #                                   'Ukiyo-e', 'Academicisim', 'Magic Realism', 'Fauvism'],
     #                         genre='nude painting (nu)')
 
     # analyze statistics of artist
     # analyze_artist(infile, artist='Pablo Picasso', genre='nude painting (nu)')
 
-    # filter the painters during the Baroque period
-    # df = filter_baroque(infile=infile, is_grouped_by_artist=True, is_grouped_by_genre=False, show_all=False)
-    # create_dataset(df, indir=indir, outdir=outdir_baroque)
-    # create_painter_dir(df, indir=outdir_baroque)
+    # filter style, genre and artist
+    classical_artist_list = ['El Greco', 'Titian', 'Michelangelo', 'Caravaggio', 'Pierre-Auguste Renoir',
+                             'Edgar Degas', 'Pierre-Paul Prud\'hon', 'Artemisia Gentileschi']
 
-    # filter the painters for nude paintings
-    # df, df_group = filter_nude(infile=infile, is_grouped_by_artist=True, is_grouped_by_style=True)
+    modern_artist_list = ['Henri Matisse', 'Paul Gauguin', 'Paul Jacoulet', 'Kathe Kollwitz', 'Tamara de Lempicka',
+                          'Amedeo Modigliani', 'Paul Delvaux', 'Felix Vallotton ']
+
+    df, df_group = filter_style_genre_artist(infile=infile, artist_list=modern_artist_list, style=None, genre=None,
+                                             is_grouped_by_artist=True, is_grouped_by_style=True, is_grouped_by_genre=False, show_all=False)
     # create_dataset(df, indir=indir, outdir=outdir_nude)
     # create_painter_dir(df, indir=outdir_nude)
 
@@ -424,7 +409,8 @@ if __name__ == '__main__':
     # plot_stacked_bar_chart(df, colname='artist', outfile = outfile_timeline_nu_artist)
 
     # plot the pie chart for the nude paintings grouped by styles
-    _, df = filter_nude(infile=infile, is_grouped_by_artist=False, is_grouped_by_style=True)
-    df = filter_combined_styles(df)
-    plot_stacked_bar_chart(df, colname='style', outfile=outfile_vstack_style, is_hstack=False)
+    # _, df = filter_style_genre_artist(infile=infile, artist_list=None, style=None, genre='nude painting (nu)',
+    #                                   is_grouped_by_artist=False, is_grouped_by_style=True)
+    # df = filter_combined_styles(df)
+    # plot_stacked_bar_chart(df, colname='style', outfile=outfile_vstack_style, is_hstack=False)
     # plot_pie_chart(df, outfile=outfile_pie_style)
