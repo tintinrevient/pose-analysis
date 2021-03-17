@@ -21,7 +21,7 @@
 ## FLIC annotations
 
 <p float="left">
-    <img src="./pix/flic_ann.png" width=500 />
+    <img src="./pix/flic_500.png" width=500 />
 </p>
 
 ## References

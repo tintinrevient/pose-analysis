@@ -11,6 +11,7 @@ mat_dir = os.path.join(flic_dir, 'examples.mat')
 
 # input the image idx = [0, 5003)
 img_idx = 500
+outfile = os.path.join('pix', 'flic_{}.png'.format(img_idx))
 
 examples = loadmat(mat_dir)
 examples = examples['examples'][0]
@@ -134,5 +135,14 @@ plt.plot([torso_x1, torso_x1], [torso_y1, torso_y2], linestyle='dashed', color="
 plt.plot([torso_x2, torso_x2], [torso_y2, torso_y1], linestyle='dashed', color="lightgray", linewidth=1)
 plt.plot([torso_x2, torso_x1], [torso_y2, torso_y2], linestyle='dashed', color="lightgray", linewidth=1)
 
+# save the figure
+plt.gca().set_axis_off()
+plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
+plt.margins(0, 0)
+plt.gca().xaxis.set_major_locator(plt.NullLocator())
+plt.gca().yaxis.set_major_locator(plt.NullLocator())
+plt.savefig(outfile, bbox_inches='tight', pad_inches=0)
+
+# show the figure
 plt.axis('off')
 plt.show()
