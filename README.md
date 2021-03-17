@@ -18,6 +18,12 @@
     <img src="./pix/timeline-top-26-nu-artists.png" width=900 />
 </p>
 
+## FLIC annotations
+
+<p float="left">
+    <img src="./pix/flic_ann.png" width=500 />
+</p>
+
 ## References
 * https://kanoki.org/2019/11/12/how-to-use-regex-in-pandas/
 * https://datatofish.com/string-to-integer-dataframe/
@@ -30,3 +36,9 @@
 * https://detectron2.readthedocs.io/en/latest/tutorials/models.html
 * https://detectron2.readthedocs.io/en/latest/notes/benchmarks.html
 * https://dbcollection.readthedocs.io/en/latest/datasets/flic.html
+* https://bensapp.github.io/flic-dataset.html
+* https://www.tensorflow.org/datasets/catalog/flic
+* https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+* https://www.mathworks.com/help/matlab/ref/matlabroot.html
+* https://matplotlib.org/stable/gallery/color/named_colors.html
+* https://matplotlib.org/2.1.2/api/_as_gen/matplotlib.pyplot.plot.html
