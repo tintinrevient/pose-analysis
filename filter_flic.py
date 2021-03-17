@@ -5,13 +5,14 @@ from math import isnan
 import cv2
 import matplotlib.pyplot as plt
 
-flic_dir = os.path.join('dataset', 'FLIC')
-img_dir = os.path.join(flic_dir, 'images')
-mat_dir = os.path.join(flic_dir, 'examples.mat')
-
 # input the image idx = [0, 5003)
 img_idx = 500
 outfile = os.path.join('pix', 'flic_{}.png'.format(img_idx))
+
+# FLIC dataset
+flic_dir = os.path.join('dataset', 'FLIC')
+img_dir = os.path.join(flic_dir, 'images')
+mat_dir = os.path.join(flic_dir, 'examples.mat')
 
 examples = loadmat(mat_dir)
 examples = examples['examples'][0]
