@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 indir = os.path.join('dataset', 'painter-by-numbers')
 outdir_baroque = os.path.join('dataset', 'painter-of-baroque')
 outdir_nude = os.path.join('dataset', 'painter-of-nude')
+outdir_classical_painters = os.path.join('dataset', 'painter-of-classical')
+outdir_modern_painters = os.path.join('dataset', 'painter-of-modern')
 
 # csv file
 infile = os.path.join(indir, 'all_data_info.csv')
@@ -327,32 +329,37 @@ def create_dataset(df, indir, outdir):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    for index, row in df[['artist_group', 'new_filename']].iterrows():
+    for index, row in df[['artist', 'style', 'new_filename']].iterrows():
 
-        group = row['artist_group']
-        fn = row['new_filename']
+        artist = row['artist']
+        style = row['style']
+        fn_list = row['new_filename']
 
-        print(group, fn)
+        for fn in fn_list:
 
-        if group.find('train') != -1:
+            # make the style-specific directory if it doesn't exist
+            dst_dir = os.path.join(outdir, artist, style)
+            dst = os.path.join(dst_dir, fn)
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+
             # train images are from the 'train' folder; but sometimes it is put in the 'test' folder, given 'artist_group' == 'train_and_test'.
+            # first step: try 'train' folder
             src = os.path.join(indir, 'train', fn)
-            dst = os.path.join(outdir, fn)
 
             try:
+                print('from:', src)
+                print('to:', dst)
+
                 copyfile(src, dst)
+
             except:
+                # second step: try 'test' folder
                 src = os.path.join(indir, 'test', fn)
-                copyfile(src, dst)
-        else:
-            # test images are from the 'test' folder; images are not duplicate in 'train' and 'test' folders.
-            src = os.path.join(indir, 'test', fn)
-            dst = os.path.join(outdir, fn)
 
-            try:
-                copyfile(src, dst)
-            except:
-                src = os.path.join(indir, 'train', fn)
+                print('from:', src)
+                print('to:', dst)
+
                 copyfile(src, dst)
 
 
@@ -397,7 +404,7 @@ if __name__ == '__main__':
 
     df, df_group = filter_style_genre_artist(infile=infile, artist_list=modern_artist_list, style=None, genre=None,
                                              is_grouped_by_artist=True, is_grouped_by_style=True, is_grouped_by_genre=False, show_all=False)
-    # create_dataset(df, indir=indir, outdir=outdir_nude)
+    # create_dataset(df_group, indir=indir, outdir=outdir_modern_painters)
     # create_painter_dir(df, indir=outdir_nude)
 
     # plot the stacked bar chart for styles: (counts of styles > 1000) ordered by date
