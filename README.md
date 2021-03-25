@@ -26,6 +26,10 @@
 
 ## Human parsing
 
+```bash
+python human_parsing.py -i dataset/FLIC/images/2-fast-2-furious-00034031.jpg -m models/lip_jppnet_384.pb
+```
+
 <p float="left">
     <img src="./pix/human_parsing_input.png" width=400 />
     <img src="./pix/human_parsing_output.png" width=400 />
