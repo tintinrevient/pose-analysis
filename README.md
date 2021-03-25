@@ -48,6 +48,14 @@ python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Mag
 
 ## tf-pose
 
+python 3.6 + tensorflow 1.15 + tf-pose, as tf-pose works only with tensorflow < 2.0
+```bash
+conda create -n py3.6 python=3.6
+conda activate py3.6
+pip install tensorflow==1.15
+pip install tf-pose
+```
+
 ```bash
 python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg
 ```
@@ -78,3 +86,5 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 * https://github.com/opencv/opencv/blob/master/samples/dnn/openpose.py
 * https://docs.opencv.org/3.4/d7/d4f/samples_2dnn_2openpose_8cpp-example.html
 * https://github.com/opencv/opencv/blob/master/samples/dnn/human_parsing.py
+* https://www.tensorflow.org/install/pip
+* https://pypi.org/project/tf-pose/
