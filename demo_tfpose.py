@@ -10,7 +10,6 @@ from tf_pose.networks import get_graph_path, model_wh
 import math
 import os
 
-input_fn = os.path.join('dataset', 'FLIC', 'images', '2-fast-2-furious-00032131.jpg')
 
 logger = logging.getLogger('TfPoseEstimator-WebCam')
 logger.setLevel(logging.INFO)
@@ -109,7 +108,7 @@ if __name__ == '__main__':
     num_of_humans = len(humans)
     print("Total number of humans : ", num_of_humans)
 
-    # # distance calculations
+    # # distance calculations for mountain_pose
     # head_hand_dst_l = int(euclidian(find_point(pose, 0), find_point(pose, 7)))
     # head_hand_dst_r = int(euclidian(find_point(pose, 0), find_point(pose, 4)))
     # m_pose = int(euclidian(find_point(pose, 7), find_point(pose, 4)))
@@ -123,7 +122,7 @@ if __name__ == '__main__':
     #     draw_str(image, (20, 50), action, orange_color, 2)
     #     logger.debug("*** Mountain Pose ***")
 
-    # # distance calculations
+    # # distance calculations for plank
     # head_hand_dst_l = int(euclidian(find_point(pose, 0), find_point(pose, 7)))
     # head_hand_dst_r = int(euclidian(find_point(pose, 0), find_point(pose, 4)))
     # # angle calcucations
