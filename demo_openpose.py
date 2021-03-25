@@ -68,6 +68,7 @@ inHeight = args.height
 inScale = args.scale
 
 net = cv.dnn.readNet(cv.samples.findFile(args.proto), cv.samples.findFile(args.model))
+# net = cv.dnn.readNetFromTensorflow("./models/graph_opt.pb")
 
 cap = cv.VideoCapture(args.input if args.input else 0)
 
