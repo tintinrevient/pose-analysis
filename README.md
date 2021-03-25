@@ -46,6 +46,17 @@ python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Mag
     <img src="./pix/demo_openpose.png" width=400 />
 </p>
 
+## tf-pose
+
+```bash
+python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg
+```
+
+<p float="left">
+    <img src="./pix/demo_input.jpg" width=400 />
+    <img src="./pix/demo_tfpose.png" width=400 />
+</p>
+
 ## References
 * https://kanoki.org/2019/11/12/how-to-use-regex-in-pandas/
 * https://datatofish.com/string-to-integer-dataframe/
