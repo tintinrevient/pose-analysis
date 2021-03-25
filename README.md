@@ -31,7 +31,7 @@ python demo_human_parsing.py --input dataset/painter-of-modern/Felix\ Vallotton\
 ```
 
 <p float="left">
-    <img src="./pix/demo_input.png" width=400 />
+    <img src="./pix/demo_input.jpg" width=400 />
     <img src="./pix/demo_human_parsing.png" width=400 />
 </p>
 
@@ -42,7 +42,7 @@ python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Mag
 ```
 
 <p float="left">
-    <img src="./pix/demo_input.png" width=400 />
+    <img src="./pix/demo_input.jpg" width=400 />
     <img src="./pix/demo_openpose.png" width=400 />
 </p>
 
