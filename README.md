@@ -27,12 +27,23 @@
 ## Human parsing
 
 ```bash
-python human_parsing.py -i dataset/FLIC/images/2-fast-2-furious-00034031.jpg -m models/lip_jppnet_384.pb
+python demo_human_parsing.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --model models/lip_jppnet_384.pb
 ```
 
 <p float="left">
-    <img src="./pix/human_parsing_input.png" width=400 />
-    <img src="./pix/human_parsing_output.png" width=400 />
+    <img src="./pix/demo_input.png" width=400 />
+    <img src="./pix/demo_human_parsing.png" width=400 />
+</p>
+
+## Openpose
+
+```bash
+python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --proto models/openpose_pose_coco.prototxt --model models/pose_iter_440000.caffemodel --dataset COCO
+```
+
+<p float="left">
+    <img src="./pix/demo_input.png" width=400 />
+    <img src="./pix/demo_openpose.png" width=400 />
 </p>
 
 ## References
@@ -54,4 +65,5 @@ python human_parsing.py -i dataset/FLIC/images/2-fast-2-furious-00034031.jpg -m 
 * https://matplotlib.org/stable/gallery/color/named_colors.html
 * https://matplotlib.org/2.1.2/api/_as_gen/matplotlib.pyplot.plot.html
 * https://github.com/opencv/opencv/blob/master/samples/dnn/openpose.py
+* https://docs.opencv.org/3.4/d7/d4f/samples_2dnn_2openpose_8cpp-example.html
 * https://github.com/opencv/opencv/blob/master/samples/dnn/human_parsing.py
