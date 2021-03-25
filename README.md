@@ -24,6 +24,13 @@
     <img src="./pix/flic_500.png" width=500 />
 </p>
 
+## Human parsing
+
+<p float="left">
+    <img src="./pix/human_parsing_input.png" width=400 />
+    <img src="./pix/human_parsing_output.png" width=400 />
+</p>
+
 ## References
 * https://kanoki.org/2019/11/12/how-to-use-regex-in-pandas/
 * https://datatofish.com/string-to-integer-dataframe/
@@ -42,3 +49,5 @@
 * https://www.mathworks.com/help/matlab/ref/matlabroot.html
 * https://matplotlib.org/stable/gallery/color/named_colors.html
 * https://matplotlib.org/2.1.2/api/_as_gen/matplotlib.pyplot.plot.html
+* https://github.com/opencv/opencv/blob/master/samples/dnn/openpose.py
+* https://github.com/opencv/opencv/blob/master/samples/dnn/human_parsing.py
