@@ -92,13 +92,8 @@ def estimate_pose(infile, show):
     # hasImage, image = cap.read()
     image = cv2.imread(infile)
 
-    fname = infile[infile.find('/')+1:]
-    outdir = os.path.join('output', infile[infile.find('/')+1:infile.rfind('/')])
-
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-
-    outfile = os.path.join('output', fname)
+    # generate out directory and out file
+    outfile = generate_outfile(infile=infile)
 
     estimator = TfPoseEstimator(get_graph_path('cmu'), target_size=(width, height))
 
@@ -118,6 +113,19 @@ def estimate_pose(infile, show):
         print('output:', outfile)
 
 
+def generate_outfile(infile):
+
+    outdir = os.path.join('output', infile[infile.find('/') + 1:infile.rfind('/')])
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    fname = infile[infile.find('/') + 1:]
+    outfile = os.path.join('output', fname)
+
+    return outfile
+
+
 if __name__ == '__main__':
 
     orange_color = (0, 140, 255)
@@ -128,8 +136,6 @@ if __name__ == '__main__':
 
     logger.debug('initialization %s : %s' % ('cmu', get_graph_path('cmu')))
     width, height = model_wh('432x368')
-    print('widht:', width)
-    print('height:', height)
 
     if os.path.isdir(args.input):
         for path in Path(args.input).rglob('*.jpg'):
@@ -137,6 +143,8 @@ if __name__ == '__main__':
 
     elif os.path.isfile(args.input):
         estimate_pose(infile=args.input, show=False)
+    else:
+        pass
 
     # # distance calculations for mountain_pose
     # head_hand_dst_l = int(euclidian(find_point(pose, 0), find_point(pose, 7)))
