@@ -9,12 +9,13 @@ from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 import math
 import os
+from pathlib import Path
 
 
 logger = logging.getLogger('TfPoseEstimator-WebCam')
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
@@ -83,6 +84,40 @@ def draw_str(dst, xxx_todo_changeme, s, color, scale):
     cv2.putText(dst, s, (x, y), cv2.FONT_HERSHEY_PLAIN, scale, (255, 255, 255), lineType=11)
 
 
+def estimate_pose(infile, show):
+
+    print('input:', infile)
+
+    # cap = cv2.VideoCapture(args.input)
+    # hasImage, image = cap.read()
+    image = cv2.imread(infile)
+
+    fname = infile[infile.find('/')+1:]
+    outdir = os.path.join('output', infile[infile.find('/')+1:infile.rfind('/')])
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    outfile = os.path.join('output', fname)
+
+    estimator = TfPoseEstimator(get_graph_path('cmu'), target_size=(width, height))
+
+    humans = estimator.inference(image, resize_to_default=True, upsample_size=4.0)
+    pose = humans
+    image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
+
+    num_of_humans = len(humans)
+    print("Total number of humans : ", num_of_humans)
+
+    if show:
+        cv2.imshow('tf-pose-estimation result', image)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+    else:
+        cv2.imwrite(outfile, image)
+        print('output:', outfile)
+
+
 if __name__ == '__main__':
 
     orange_color = (0, 140, 255)
@@ -96,17 +131,12 @@ if __name__ == '__main__':
     print('widht:', width)
     print('height:', height)
 
-    cap = cv2.VideoCapture(args.input)
-    hasImage, image = cap.read()
+    if os.path.isdir(args.input):
+        for path in Path(args.input).rglob('*.jpg'):
+            estimate_pose(infile=str(path), show=False)
 
-    estimator = TfPoseEstimator(get_graph_path('cmu'), target_size=(width, height))
-
-    humans = estimator.inference(image, resize_to_default=True, upsample_size=4.0)
-    pose = humans
-    image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
-
-    num_of_humans = len(humans)
-    print("Total number of humans : ", num_of_humans)
+    elif os.path.isfile(args.input):
+        estimate_pose(infile=args.input, show=False)
 
     # # distance calculations for mountain_pose
     # head_hand_dst_l = int(euclidian(find_point(pose, 0), find_point(pose, 7)))
@@ -137,23 +167,20 @@ if __name__ == '__main__':
     #     draw_str(image, (20, 50), " Plank", orange_color, 2)
     #     logger.debug("*** Plank ***")
 
-    Total_body_r = int(euclidian(find_point(pose, 0), find_point(pose, 10)))  # Right height
-    Total_body_l = int(euclidian(find_point(pose, 0), find_point(pose, 13)))  # Left height
-    Leg_r = int(euclidian(find_point(pose, 8), find_point(pose, 10)))  # Right leg
-    Leg_l = int(euclidian(find_point(pose, 11), find_point(pose, 13)))  # Left leg
-
-    print(Leg_l, Total_body_l)
-    print(Leg_r, Total_body_r)
-
-    try:
-        LBR_l = round(Leg_l / Total_body_l, 2)
-        LBR_r = round(Leg_r / Total_body_r, 2)
-        average_ratio = round((LBR_l + LBR_r) / 2, 3)
-    except:
-        pass
-
-    draw_str(image, (20, 80), "leg to body ratio = " + str(average_ratio), orange_color, 1.5)
-
-    cv2.imshow('tf-pose-estimation result', image)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # body ratio
+    # Total_body_r = int(euclidian(find_point(pose, 0), find_point(pose, 10)))  # Right height
+    # Total_body_l = int(euclidian(find_point(pose, 0), find_point(pose, 13)))  # Left height
+    # Leg_r = int(euclidian(find_point(pose, 8), find_point(pose, 10)))  # Right leg
+    # Leg_l = int(euclidian(find_point(pose, 11), find_point(pose, 13)))  # Left leg
+    #
+    # print(Leg_l, Total_body_l)
+    # print(Leg_r, Total_body_r)
+    #
+    # try:
+    #     LBR_l = round(Leg_l / Total_body_l, 2)
+    #     LBR_r = round(Leg_r / Total_body_r, 2)
+    #     average_ratio = round((LBR_l + LBR_r) / 2, 3)
+    # except:
+    #     pass
+    #
+    # draw_str(image, (20, 80), "leg to body ratio = " + str(average_ratio), orange_color, 1.5)
