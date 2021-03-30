@@ -88,3 +88,7 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 * https://github.com/opencv/opencv/blob/master/samples/dnn/human_parsing.py
 * https://www.tensorflow.org/install/pip
 * https://pypi.org/project/tf-pose/
+* https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1273
+* https://github.com/lara-unb/openpose/blob/master/doc/output.md#pose-output-format
+* https://github.com/tintinrevient/openpose/blob/master/doc/02_output.md#keypoint-format-in-datum-advanced
+* https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/pose/poseParametersRender.hpp
