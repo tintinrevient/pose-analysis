@@ -37,6 +37,9 @@ joint_triples = [
     ('RAnkle', 'RKnee', 'RHip'), ('LAnkle', 'LKnee', 'LHip')
 ]
 
+# 'zero' and 'nan' will result in errors in hierarchical clustering
+minimum_positive_above_zero = np.nextafter(0, 1)
+
 
 def euclidian(point1, point2):
 
@@ -44,8 +47,6 @@ def euclidian(point1, point2):
 
 
 def calc_angle(point1, center, point2):
-
-    minimum_positive_above_zero = np.nextafter(0, 1)
 
     try:
         dx1 = point1[0] - center[0]
@@ -97,42 +98,81 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
     print('dimension:', data['dimension'])
     print('number of people:', data['keypoints'].shape[0])
 
-    fname = infile[infile.rfind('/') + 1:infile.rfind('_')]
     person_index = 0
+    index_fname = '{}_{}'.format(infile.split('/')[3], infile[infile.rfind('/')+1:infile.rfind('_')])
 
-    if show:
-        image = cv2.imread(os.path.join('test', 'pix', '{}.jpg'.format(fname)))
+    image_fname = infile.replace('/data/', '/pix/').replace('_keypoints.npy', '_rendered.png')
+    image = cv2.imread(image_fname)
 
-    # iterate through the keypoints of all the people
+    # iterate through all people
     for keypoints in data['keypoints']:
 
-        # process the keypoints of one person
+        # process one person: create keypoints + rotated_keypoints
         keypoints = dict(zip(joint_ids, keypoints))
         rotated_keypoints = {}
 
-        # if not valid, skip to the next keypoints
+        # if not valid, skip to the next person
         if not is_valid(keypoints=keypoints):
             continue
 
-        # for one person
+        # process one person: generate person index
         person_index += 1
-        output_index.append('{}_{}'.format(fname, person_index))
+        output_index.append('{}_{}'.format(index_fname, person_index))
 
-        # calculate the angle of rotation in rad
+        ###############
+        # Bounding Box#
+        ###############
+        # process one person: generate bbox
+        min_x = data['dimension'][1]
+        max_x = 0
+        min_y = data['dimension'][0]
+        max_y = 0
+
+        for key, value in keypoints.items():
+            x, y, score = value
+
+            if score == 0.0:
+                continue
+
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+
+        x = int(min_x)
+        y = int(min_y)
+        w = int(max_x - min_x)
+        h = int(max_y - min_y)
+        image_bbox = image[y:y + h, x:x + w]
+
+        person_fname = image_fname.replace('_rendered', '_' + str(person_index))
+        cv2.imwrite(person_fname, image_bbox)
+
+        ###########
+        # Rotation#
+        ###########
+        # process one person: calculate the angle of rotation in rad
         reference_point = keypoints['MidHip'] + [0, -100, 0]
         rad, deg = calc_angle(point1=keypoints['Neck'], center=keypoints['MidHip'],point2=reference_point)
 
-        # rotate the joints around keypoints['MidHip']
+        # process one person: rotate the joints around keypoints['MidHip']
         for key, value in keypoints.items():
             rotated_value = rotate(value, keypoints['MidHip'], rad)
             rotated_keypoints[key] = rotated_value
 
-        # for one person
+        #####################
+        # Angles of 3 Joints#
+        #####################
+        # process one person: calculate angles between joint triples
         for index, triple in enumerate(joint_triples):
 
-            point1 = rotated_keypoints.get(triple[0])
-            center = rotated_keypoints.get(triple[1])
-            point2 = rotated_keypoints.get(triple[2])
+            point1 = keypoints.get(triple[0])
+            center = keypoints.get(triple[1])
+            point2 = keypoints.get(triple[2])
 
             col_name = '{}_{}_{}'.format(triple[0], triple[1], triple[2])
 
@@ -143,20 +183,23 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
                 rad, deg = calc_angle(point1=point1, center=center, point2=point2)
                 output_dict[col_name].append(rad)
             else:
-                output_dict[col_name].append(0.0)
+                output_dict[col_name].append(minimum_positive_above_zero)
 
+        #############
+        # Draw image#
+        #############
         if show:
             for index, pair in enumerate(joint_pairs):
                 if keypoints.get(pair[0])[2] != 0 and keypoints.get(pair[1])[2] != 0:
-                    # draw original keypoints
+                    # draw original keypoints in yellow
                     point1 = (int(keypoints.get(pair[0])[0]), int(keypoints.get(pair[0])[1]))
                     point2 = (int(keypoints.get(pair[1])[0]), int(keypoints.get(pair[1])[1]))
-                    cv2.line(image, point1, point2, color=(255, 0, 255), thickness=5)
+                    cv2.line(image, point1, point2, color=(0, 255, 255), thickness=5)
 
-                    # draw rotated keypoints
+                    # draw rotated keypoints in magenta
                     rotated_point1 = (rotated_keypoints.get(pair[0])[0], rotated_keypoints.get(pair[0])[1])
                     rotated_point2 = (rotated_keypoints.get(pair[1])[0], rotated_keypoints.get(pair[1])[1])
-                    cv2.line(image, rotated_point1, rotated_point2, color=(255, 255, 0), thickness=5)
+                    cv2.line(image, rotated_point1, rotated_point2, color=(255, 0, 255), thickness=5)
 
     if show:
         cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", image)
@@ -168,19 +211,21 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
 
 if __name__ == '__main__':
 
-        parser = argparse.ArgumentParser(description='Extract the angles of keypoints')
-        parser.add_argument("--input", help="a directory or a single npy keypoints data")
-        args = parser.parse_args()
+    # python analyze_keypoints.py --input output/data/
 
-        output_dict = {}
-        output_index = []
+    parser = argparse.ArgumentParser(description='Extract the angles of keypoints')
+    parser.add_argument("--input", help="a directory or a single npy keypoints data")
+    args = parser.parse_args()
 
-        if os.path.isfile(args.input):
-            load_keypoints(infile=args.input, show=True)
+    output_dict = {}
+    output_index = []
 
-        elif os.path.isdir(args.input):
-            for path in Path(args.input).rglob('*.npy'):
-                output_dict, output_index = load_keypoints(infile=str(path), output_dict=output_dict, output_index=output_index)
+    if os.path.isfile(args.input):
+        load_keypoints(infile=args.input, show=True)
+
+    elif os.path.isdir(args.input):
+        for path in Path(args.input).rglob('*.npy'):
+            output_dict, output_index = load_keypoints(infile=str(path), output_dict=output_dict, output_index=output_index)
 
         df = pd.DataFrame(data=output_dict, index=output_index)
-        df.to_csv('test/test.csv', index=True)
+        df.to_csv(os.path.join('output', 'joint_angles.csv'), index=True)

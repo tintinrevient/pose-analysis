@@ -1,28 +1,10 @@
-import math
-from pathlib import Path
 import pandas as pd
-import numpy as np
-
-from sklearn import preprocessing
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
-
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
-from scipy.stats import multivariate_normal
-
-import prince
-
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.colors import from_levels_and_colors
-import seaborn as sns
-
 import os
 
-# import the data
 
-POSE_DATA_CSV = os.path.join('test', 'test.csv')
+POSE_DATA_CSV = os.path.join('output', 'joint_angles.csv')
 pose_data = pd.read_csv(POSE_DATA_CSV, index_col=0)
 
 df = pose_data
