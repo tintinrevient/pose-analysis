@@ -65,6 +65,27 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
     <img src="./pix/demo_tfpose.png" width=400 />
 </p>
 
+## Analyze poses
+
+1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder here;
+```bash
+python extract_keypoints_pyopenpose.py --input datasets/
+```
+
+2. Execute the following command to generate bbox for each valid person + angle CSV file:
+```bash
+python analyze_keypoints.py --input output/data/
+```
+
+3. Execute the following command to generate the dendrogram:
+```bash
+python hierarchical_clustering.py
+```
+
+<p float="left">
+    <img src="./pix/dendrogram.png" width=600 />
+</p>
+
 ## References
 * https://kanoki.org/2019/11/12/how-to-use-regex-in-pandas/
 * https://datatofish.com/string-to-integer-dataframe/
