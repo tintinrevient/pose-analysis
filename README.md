@@ -92,3 +92,4 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 * https://github.com/lara-unb/openpose/blob/master/doc/output.md#pose-output-format
 * https://github.com/tintinrevient/openpose/blob/master/doc/02_output.md#keypoint-format-in-datum-advanced
 * https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/pose/poseParametersRender.hpp
+* https://github.com/gedeck/practical-statistics-for-data-scientists
