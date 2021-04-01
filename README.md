@@ -82,16 +82,16 @@ python analyze_keypoints.py --input output/data/
 ```
 
 <p float="left">
-    <img src="./pix/54409_1.png" width=150 />
-    <img src="./pix/54409_norm_1.png" width=150 />
-    <img src="./pix/54409_2.png" width=150 />
-    <img src="./pix/54409_norm_2.png" width=150 />
-    <img src="./pix/54409_3.png" width=150 />
-    <img src="./pix/54409_norm_3.png" width=150 />
+    <img src="./pix/54409_1.png" width=100 />
+    <img src="./pix/54409_norm_1.png" width=100 />
+    <img src="./pix/54409_2.png" width=100 />
+    <img src="./pix/54409_norm_2.png" width=100 />
+    <img src="./pix/54409_3.png" width=100 />
+    <img src="./pix/54409_norm_3.png" width=100 />
 </p>
 
 <p float="left">
-    <img src="./pix/54409_rendered.png" width=600 />
+    <img src="./pix/54409_rendered.png" width=500 />
 </p>
 
 3. Execute the following command to generate the dendrogram:
