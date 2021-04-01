@@ -167,9 +167,9 @@ def norm_pose(rotated_keypoints, show):
 
     # normalized joint locations (x, y, score)
     neck_xy = (150, 100, 1)
-    midhip_xy = (150, 170, 1) # length of body = 70 -> (170 - 100)
-    upper_xy = (150, 70, 1) # length of limbs + nose = 30 -> (100 - 70)
-    lower_xy = (150, 140, 1) # length of limbs = 30 -> (170 - 140)
+    midhip_xy = (150, 170, 1)  # length of body = 70 -> (170 - 100)
+    upper_xy = (150, 70, 1)  # length of limbs + nose = 30 -> (100 - 70)
+    lower_xy = (150, 140, 1)  # length of limbs = 30 -> (170 - 140)
 
 
     # Neck to MidHip as base
@@ -344,6 +344,10 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
         # Normalize pose #
         ##################
         image_norm = norm_pose(rotated_keypoints, show=show)
+
+        # crop the image!!!
+        image_norm = image_norm[50:250, 50:250]
+
         norm_fname = image_fname.replace('_rendered', '_norm_' + str(person_index))
         cv2.imwrite(norm_fname, image_norm)
         print('output', norm_fname)
