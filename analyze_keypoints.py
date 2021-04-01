@@ -316,6 +316,12 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
         person_index += 1
         output_index.append('{}_{}'.format(index_fname, person_index))
 
+        ######################
+        # Angles of 3 Joints #
+        ######################
+        # To generate the dendrogram!!!
+        calc_joint_angle(output_dict, keypoints)
+
         ################
         # Bounding Box #
         ################
@@ -324,11 +330,6 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
         person_fname = image_fname.replace('_rendered', '_' + str(person_index))
         cv2.imwrite(person_fname, image_bbox)
         print('output', person_fname)
-
-        ######################
-        # Angles of 3 Joints #
-        ######################
-        calc_joint_angle(output_dict, keypoints)
 
         ############
         # Rotation #

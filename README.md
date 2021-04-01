@@ -72,10 +72,27 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 python extract_keypoints_pyopenpose.py --input datasets/
 ```
 
-2. Execute the following command to generate bbox for each valid person + angle CSV file:
+2. Execute the following command to generate:
+
+* For each valid person: bbox + normalized pose;
+* For all valid people: angle CSV file to generate the dendrogram later;
+
 ```bash
 python analyze_keypoints.py --input output/data/
 ```
+
+<p float="left">
+    <img src="./pix/54409_1.png" width=150 />
+    <img src="./pix/54409_norm_1.png" width=150 />
+    <img src="./pix/54409_2.png" width=150 />
+    <img src="./pix/54409_norm_2.png" width=150 />
+    <img src="./pix/54409_3.png" width=150 />
+    <img src="./pix/54409_norm_3.png" width=150 />
+</p>
+
+<p float="left">
+    <img src="./pix/54409_rendered.png" width=600 />
+</p>
 
 3. Execute the following command to generate the dendrogram:
 ```bash
