@@ -148,6 +148,19 @@ def calc_joint_angle(output_dict, keypoints):
             output_dict[col_name].append(minimum_positive_above_zero)
 
 
+def rotate_pose_to_straight_up(keypoints):
+
+    rotated_keypoints = {}
+
+    reference_point = np.array(keypoints['MidHip']) + np.array([0, -100, 0])
+    rad, deg = calc_angle(point1=keypoints['Neck'], center=keypoints['MidHip'], point2=reference_point)
+
+    for key, value in keypoints.items():
+        rotated_keypoints[key] = rotate(value, keypoints['MidHip'], rad)
+
+    return rotated_keypoints
+
+
 def xy_tuple(arr):
     return tuple(arr[0:2])
 
@@ -307,9 +320,8 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
 
         # process one person!!!
 
-        # create keypoints + rotated_keypoints
+        # create keypoints dictionary
         keypoints = dict(zip(joint_ids, keypoints))
-        rotated_keypoints = {}
 
         # if not valid, skip to the next person
         if not is_valid(keypoints=keypoints):
@@ -338,13 +350,10 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
         # Output 3 - Normalize pose #
         #############################
 
-        # rotation
-        reference_point = np.array(keypoints['MidHip']) + np.array([0, -100, 0])
-        rad, deg = calc_angle(point1=keypoints['Neck'], center=keypoints['MidHip'], point2=reference_point)
+        # rotation: transform any poses to neck-midhip-straight poses, i.e., stand up, sit up, etc...
+        rotated_keypoints = rotate_pose_to_straight_up(keypoints=keypoints)
 
-        for key, value in keypoints.items():
-            rotated_keypoints[key] = rotate(value, keypoints['MidHip'], rad)
-
+        # normalize the length of limbs
         image_norm = norm_pose(keypoints=rotated_keypoints, show=show)
 
         # crop the image!!!
