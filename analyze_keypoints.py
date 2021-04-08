@@ -152,7 +152,7 @@ def xy_tuple(arr):
     return tuple(arr[0:2])
 
 
-def norm_pose(rotated_keypoints, show):
+def norm_pose(keypoints, show):
     '''
     for keypoints of one person
     '''
@@ -168,86 +168,89 @@ def norm_pose(rotated_keypoints, show):
     # normalized joint locations (x, y, score)
     neck_xy = (150, 100, 1)
     midhip_xy = (150, 170, 1)  # length of body = 70 -> (170 - 100)
-    upper_xy = (150, 70, 1)  # length of limbs + nose = 30 -> (100 - 70)
-    lower_xy = (150, 140, 1)  # length of limbs = 30 -> (170 - 140)
+    upper_xy = (150, 70, 1)  # length of upper limbs incl. neck! = 30 -> (100 - 70) = neck_y - upper_y
+    lower_xy = (150, 140, 1)  # length of lower limbs = 30 -> (170 - 140) = midhip_y - lower_y
+
+    # reference virtual line to locate the nose!!!
+    nose_ref = np.array(upper_xy) - np.array(neck_xy) # reference line to calculate angles
 
 
     # Neck to MidHip as base
     cv2.line(image, xy_tuple(neck_xy), xy_tuple(midhip_xy), color=line_color, thickness=line_thickness)
 
     # Nose to Neck
-    if rotated_keypoints.get('Nose')[2] != 0:
-        rad, deg = calc_angle(np.array(rotated_keypoints.get('Neck')) + np.array([0, -50, 0]), rotated_keypoints.get('Neck'), rotated_keypoints.get('Nose'))
+    if keypoints.get('Nose')[2] != 0:
+        rad, deg = calc_angle(np.array(keypoints.get('Neck')) + nose_ref, keypoints.get('Neck'), keypoints.get('Nose'))
         nose_xy = rotate(upper_xy, neck_xy, rad)
         cv2.line(image, xy_tuple(nose_xy), xy_tuple(neck_xy), color=line_color, thickness=line_thickness)
 
     # RIGHT
     # RShoulder to Neck
-    rad, deg = calc_angle(np.array(rotated_keypoints.get('Neck')) + np.array([0, -50, 0]), rotated_keypoints.get('Neck'), rotated_keypoints.get('RShoulder'))
+    rad, deg = calc_angle(np.array(keypoints.get('Neck')) + nose_ref, keypoints.get('Neck'), keypoints.get('RShoulder'))
     rsho_xy = rotate(upper_xy, neck_xy, rad)
     cv2.line(image, xy_tuple(rsho_xy), xy_tuple(neck_xy), color=line_color, thickness=line_thickness)
 
     # RElbow to RShoulder
-    if rotated_keypoints.get('RElbow')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('Neck'), rotated_keypoints.get('RShoulder'), rotated_keypoints.get('RElbow'))
+    if keypoints.get('RElbow')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('Neck'), keypoints.get('RShoulder'), keypoints.get('RElbow'))
         relb_xy = rotate(neck_xy, rsho_xy, rad)
         cv2.line(image, xy_tuple(relb_xy), xy_tuple(rsho_xy), color=line_color, thickness=line_thickness)
 
     # RWrist to RElbow
-    if rotated_keypoints.get('RElbow')[2] != 0 and rotated_keypoints.get('RWrist')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('RShoulder'), rotated_keypoints.get('RElbow'), rotated_keypoints.get('RWrist'))
+    if keypoints.get('RElbow')[2] != 0 and keypoints.get('RWrist')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('RShoulder'), keypoints.get('RElbow'), keypoints.get('RWrist'))
         rwrist_xy = rotate(rsho_xy, relb_xy, rad)
         cv2.line(image, xy_tuple(rwrist_xy), xy_tuple(relb_xy), color=line_color, thickness=line_thickness)
 
     # RHip to MidHip
-    rad, deg = calc_angle(rotated_keypoints.get('Neck'), rotated_keypoints.get('MidHip'), rotated_keypoints.get('RHip'))
+    rad, deg = calc_angle(keypoints.get('Neck'), keypoints.get('MidHip'), keypoints.get('RHip'))
     rhip_xy = rotate(lower_xy, midhip_xy, rad)
     cv2.line(image, xy_tuple(rhip_xy), xy_tuple(midhip_xy), color=line_color, thickness=line_thickness)
 
     # RKnee to RHip
-    if rotated_keypoints.get('RKnee')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('MidHip'), rotated_keypoints.get('RHip'), rotated_keypoints.get('RKnee'))
+    if keypoints.get('RKnee')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('MidHip'), keypoints.get('RHip'), keypoints.get('RKnee'))
         rknee_xy = rotate(midhip_xy, rhip_xy, rad)
         cv2.line(image, xy_tuple(rknee_xy), xy_tuple(rhip_xy), color=line_color, thickness=line_thickness)
 
     # RAnkle to RKnee
-    if rotated_keypoints.get('RKnee')[2] != 0 and rotated_keypoints.get('RAnkle')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('RHip'), rotated_keypoints.get('RKnee'), rotated_keypoints.get('RAnkle'))
+    if keypoints.get('RKnee')[2] != 0 and keypoints.get('RAnkle')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('RHip'), keypoints.get('RKnee'), keypoints.get('RAnkle'))
         rankle_xy = rotate(rhip_xy, rknee_xy, rad)
         cv2.line(image, xy_tuple(rankle_xy), xy_tuple(rknee_xy), color=line_color, thickness=line_thickness)
 
     # LEFT
     # LShoulder to Neck
-    rad, deg = calc_angle(np.array(rotated_keypoints.get('Neck')) + np.array([0, -50, 0]), rotated_keypoints.get('Neck'), rotated_keypoints.get('LShoulder'))
+    rad, deg = calc_angle(np.array(keypoints.get('Neck')) + np.array([0, -50, 0]), keypoints.get('Neck'), keypoints.get('LShoulder'))
     lsho_xy = rotate(upper_xy, neck_xy, rad)
     cv2.line(image, xy_tuple(lsho_xy), xy_tuple(neck_xy), color=line_color, thickness=line_thickness)
 
     # LElbow to LShoulder
-    if rotated_keypoints.get('LElbow')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('Neck'), rotated_keypoints.get('LShoulder'), rotated_keypoints.get('LElbow'))
+    if keypoints.get('LElbow')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('Neck'), keypoints.get('LShoulder'), keypoints.get('LElbow'))
         lelb_xy = rotate(neck_xy, lsho_xy, rad)
         cv2.line(image, xy_tuple(lelb_xy), xy_tuple(lsho_xy), color=line_color, thickness=line_thickness)
 
     # LWrist to LElbow
-    if rotated_keypoints.get('LElbow')[2] != 0 and rotated_keypoints.get('LWrist')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('LShoulder'), rotated_keypoints.get('LElbow'), rotated_keypoints.get('LWrist'))
+    if keypoints.get('LElbow')[2] != 0 and keypoints.get('LWrist')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('LShoulder'), keypoints.get('LElbow'), keypoints.get('LWrist'))
         lwrist_xy = rotate(lsho_xy, lelb_xy, rad)
         cv2.line(image, xy_tuple(lwrist_xy), xy_tuple(lelb_xy), color=line_color, thickness=line_thickness)
 
     # LHip to MidHip
-    rad, deg = calc_angle(rotated_keypoints.get('Neck'), rotated_keypoints.get('MidHip'), rotated_keypoints.get('LHip'))
+    rad, deg = calc_angle(keypoints.get('Neck'), keypoints.get('MidHip'), keypoints.get('LHip'))
     lhip_xy = rotate(lower_xy, midhip_xy, rad)
     cv2.line(image, xy_tuple(lhip_xy), xy_tuple(midhip_xy), color=line_color, thickness=line_thickness)
 
     # LKnee to LHip
-    if rotated_keypoints.get('LKnee')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('MidHip'), rotated_keypoints.get('LHip'), rotated_keypoints.get('LKnee'))
+    if keypoints.get('LKnee')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('MidHip'), keypoints.get('LHip'), keypoints.get('LKnee'))
         lknee_xy = rotate(midhip_xy, lhip_xy, rad)
         cv2.line(image, xy_tuple(lknee_xy), xy_tuple(lhip_xy), color=line_color, thickness=line_thickness)
 
     # LAnkle to LKnee
-    if rotated_keypoints.get('LKnee')[2] != 0 and rotated_keypoints.get('LAnkle')[2] != 0:
-        rad, deg = calc_angle(rotated_keypoints.get('LHip'), rotated_keypoints.get('LKnee'), rotated_keypoints.get('LAnkle'))
+    if keypoints.get('LKnee')[2] != 0 and keypoints.get('LAnkle')[2] != 0:
+        rad, deg = calc_angle(keypoints.get('LHip'), keypoints.get('LKnee'), keypoints.get('LAnkle'))
         lankle_xy = rotate(lhip_xy, lknee_xy, rad)
         cv2.line(image, xy_tuple(lankle_xy), xy_tuple(lknee_xy), color=line_color, thickness=line_thickness)
 
@@ -316,34 +319,33 @@ def load_keypoints(infile, output_dict={}, output_index=[], show=False):
         person_index += 1
         output_index.append('{}_{}'.format(index_fname, person_index))
 
-        ######################
-        # Angles of 3 Joints #
-        ######################
+        #################################
+        # Output 1 - Angles of 3 Joints #
+        #################################
         # To generate the dendrogram!!!
         calc_joint_angle(output_dict, keypoints)
 
-        ################
-        # Bounding Box #
-        ################
+        ###########################
+        # Output 2 - Bounding Box #
+        ###########################
         image_bbox = clip_bbox(image, keypoints, data['dimension'])
 
         person_fname = image_fname.replace('_rendered', '_' + str(person_index))
         cv2.imwrite(person_fname, image_bbox)
         print('output', person_fname)
 
-        ############
-        # Rotation #
-        ############
+        #############################
+        # Output 3 - Normalize pose #
+        #############################
+
+        # rotation
         reference_point = np.array(keypoints['MidHip']) + np.array([0, -100, 0])
         rad, deg = calc_angle(point1=keypoints['Neck'], center=keypoints['MidHip'], point2=reference_point)
 
         for key, value in keypoints.items():
             rotated_keypoints[key] = rotate(value, keypoints['MidHip'], rad)
 
-        ##################
-        # Normalize pose #
-        ##################
-        image_norm = norm_pose(rotated_keypoints, show=show)
+        image_norm = norm_pose(keypoints=rotated_keypoints, show=show)
 
         # crop the image!!!
         image_norm = image_norm[50:250, 50:250]
@@ -363,9 +365,10 @@ if __name__ == '__main__':
 
     # python analyze_keypoints.py --input output/data/
 
-    # Felix\ Vallotton/7043_keypoints.npy
-    # Paul\ Delvaux/81511_keypoints.npy
-    # Paul\ Delvaux/74433_keypoints.npy
+    # python analyze_keypoints.py --input output/data/modern/Felix\ Vallotton/7043_keypoints.npy
+    # python analyze_keypoints.py --input output/data/modern/Paul\ Delvaux/81511_keypoints.npy
+    # python analyze_keypoints.py --input output/data/modern/Paul\ Delvaux/74433_keypoints.npy
+    # python analyze_keypoints.py --input output/data/classical/Michelangelo/6834_keypoints.npy
 
     parser = argparse.ArgumentParser(description='Extract the angles of keypoints')
     parser.add_argument("--input", help="a directory or a single npy keypoints data")
