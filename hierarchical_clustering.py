@@ -81,15 +81,7 @@ def _get_offset_image(xtick, label, ax):
     ax.add_artist(ab)
 
 
-def show_clusters(Z, num_cluster, df):
-
-    memb = fcluster(Z, num_cluster, criterion='maxclust')
-    memb = pd.Series(memb, index=df.index)
-    for key, item in memb.groupby(memb):
-        print(f"{key} : {', '.join(item.index)}")
-
-
-def generate_dendrogram(artist, show_pose, num_cluster):
+def generate_dendrogram(artist, show_pose):
     # read the data
     df = _read_data(artist)
 
@@ -124,28 +116,44 @@ def generate_dendrogram(artist, show_pose, num_cluster):
     # save the plot
     plt.savefig(outfile, bbox_inches='tight', pad_inches=0, dpi=227)
 
+
+def generate_clusters(artist, num_cluster):
+
+    # read the data
+    df = _read_data(artist)
+
+    # linked
+    Z = linkage(df, method='complete')
+
     # show the clusters
-    show_clusters(Z, num_cluster, df)
+    memb = fcluster(Z, num_cluster, criterion='maxclust')
+    memb = pd.Series(memb, index=df.index)
+    for key, item in memb.groupby(memb):
+        print(f"{key} : {', '.join(item.index)}")
 
 
 if __name__ == '__main__':
 
     # for all artists
     # python hierarchical_clustering.py
+    # python hierarchical_clustering.py --cluster 10
 
     # for one artist
     # python hierarchical_clustering.py --cluster 5 --artist "Pierre-Paul Prud\'hon" --pose True
 
     parser = argparse.ArgumentParser(description='Extract the angles of keypoints')
-    parser.add_argument("--cluster", default=5, help="number of clusters")
     parser.add_argument("--artist", help="name of artist")
     parser.add_argument("--pose", default=False, help="whether to show the pose by xtick")
+    parser.add_argument("--cluster", default=5, help="number of clusters")
     args = parser.parse_args()
 
     # input setting
-    num_cluster = int(args.cluster)
     artist = args.artist if args.artist else None
     show_pose = True if args.pose == 'True' else False
+    num_cluster = int(args.cluster)
 
-    # generate the dentrogram and the detail of clusters
-    generate_dendrogram(artist, show_pose, num_cluster)
+    # step 1: generate the dentrogram
+    generate_dendrogram(artist, show_pose)
+
+    # step 2: generate the clusters
+    generate_clusters(artist, num_cluster)
