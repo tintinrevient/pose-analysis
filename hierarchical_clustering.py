@@ -2,62 +2,76 @@ import pandas as pd
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
 import os
-import numpy as np
+import argparse
 from matplotlib.offsetbox import OffsetImage,AnnotationBbox
 
-# input setting
-num_cluster = 5
-category = 'classical'
-artist = 'Michelangelo'
-size = 10
 
-if artist:
-    outfile = os.path.join('pix', 'dendrogram{}.png'.format('_' + artist))
-else:
-    outfile = os.path.join('pix', 'dendrogram.png')
-
+# CSV data
 POSE_DATA_CSV = os.path.join('output', 'joint_angles.csv')
-pose_data = pd.read_csv(POSE_DATA_CSV, index_col=0)
 
-df = pose_data
-columns = df.columns
-
-# filter for one artist
-if artist:
-    df = df.loc[df.index.str.contains(artist), columns]
-
-print(df)
-
-Z = linkage(df, method='complete')
-print(Z.shape)
-
-# plot the dendrogram
-
-if artist:
-    fig, ax = plt.subplots(figsize=(size, 5))
-else:
-    fig, ax = plt.subplots(figsize=(30, 5))
+# all the artists
+classical_artists = ['Artemisia Gentileschi', 'El Greco', 'Michelangelo', 'Pierre-Auguste Renoir', 'Pierre-Paul Prud\'hon']
+modern_artists = ['Amedeo Modigliani', 'Felix Vallotton', 'Paul Delvaux', 'Paul Gauguin', 'Tamara de Lempicka']
 
 
-dendrogram(Z, labels=list(df.index), color_threshold=0)
+def _read_data(artist):
 
-# xticks
-plt.xticks(rotation=90)
-# ylabel
-ax.set_ylabel('distance')
+    per_artist = True if artist else False
 
-# show the corresponding images on xticks
-def get_flag(name):
+    df = pd.read_csv(POSE_DATA_CSV, index_col=0)
+    columns = df.columns
+
+    # filter for one artist
+    if per_artist:
+        df = df.loc[df.index.str.contains(artist), columns]
+
+    print(df)
+    return df
+
+
+def _plot_setting(artist):
+
+    per_artist = True if artist else False
+
+    if per_artist:
+        outfile = os.path.join('pix', 'dendrogram-{}.png'.format(artist.replace(' ', '-').lower()))
+    else:
+        outfile = os.path.join('pix', 'dendrogram.png')
+
+    # size
+    if artist == None:
+        size = 30
+    elif artist == 'Paul Delvaux':
+        size = 26
+    elif artist == 'El Greco':
+        size = 16
+    elif artist == 'Paul Gauguin':
+        size = 20
+    else:
+        size = 10
+
+    return outfile, size
+
+
+def _get_norm_pose_img(name):
+    '''show the corresponding images on xticks'''
     name_list = name.split('_')
+
+    # artist
     artist = name_list[0]
+    # fname
     fname = '%s_norm_%s.png' % (name_list[1], name_list[2])
+    #category
+    category = 'classical' if artist in classical_artists else 'modern'
+
     path = "output/pix/%s/%s/%s" % (category, artist, fname)
     im = plt.imread(path)
     return im
 
-def offset_image(xtick, label, ax):
+
+def _get_offset_image(xtick, label, ax):
     name = label.get_text()
-    img = get_flag(name)
+    img = _get_norm_pose_img(name)
     im = OffsetImage(img, zoom=0.2)
     im.image.axes = ax
 
@@ -66,23 +80,72 @@ def offset_image(xtick, label, ax):
 
     ax.add_artist(ab)
 
-xticks = list(ax.get_xticks())
-xticklabels = list(ax.get_xticklabels())
 
-for xtick, label in zip(xticks, xticklabels):
-    offset_image(xtick, label, ax)
+def show_clusters(Z, num_cluster, df):
 
-# don't show axis
-plt.axis('off')
+    memb = fcluster(Z, num_cluster, criterion='maxclust')
+    memb = pd.Series(memb, index=df.index)
+    for key, item in memb.groupby(memb):
+        print(f"{key} : {', '.join(item.index)}")
 
-# save the plot
-plt.savefig(outfile, bbox_inches='tight', pad_inches=0, dpi=227)
 
-# show the plot
-# plt.tight_layout()
-# plt.show()
+def generate_dendrogram(artist, show_pose, num_cluster):
+    # read the data
+    df = _read_data(artist)
 
-memb = fcluster(Z, num_cluster, criterion='maxclust')
-memb = pd.Series(memb, index=df.index)
-for key, item in memb.groupby(memb):
-    print(f"{key} : {', '.join(item.index)}")
+    # setting of plot
+    outfile, size = _plot_setting(artist)
+
+    # linked
+    Z = linkage(df, method='complete')
+    print(Z.shape)
+
+    # plot the dendrogram
+    fig, ax = plt.subplots(figsize=(size, 5))
+
+    dendrogram(Z, labels=list(df.index), color_threshold=0)
+
+    # xticks
+    plt.xticks(rotation=90)
+    # ylabel
+    ax.set_ylabel('distance')
+
+    if show_pose:
+        # xticks with images
+        xticks = list(ax.get_xticks())
+        xticklabels = list(ax.get_xticklabels())
+
+        for xtick, label in zip(xticks, xticklabels):
+            _get_offset_image(xtick, label, ax)
+
+        # don't show axis
+        plt.axis('off')
+
+    # save the plot
+    plt.savefig(outfile, bbox_inches='tight', pad_inches=0, dpi=227)
+
+    # show the clusters
+    show_clusters(Z, num_cluster, df)
+
+
+if __name__ == '__main__':
+
+    # for all artists
+    # python hierarchical_clustering.py
+
+    # for one artist
+    # python hierarchical_clustering.py --cluster 5 --artist "Pierre-Paul Prud\'hon" --pose True
+
+    parser = argparse.ArgumentParser(description='Extract the angles of keypoints')
+    parser.add_argument("--cluster", default=5, help="number of clusters")
+    parser.add_argument("--artist", help="name of artist")
+    parser.add_argument("--pose", default=False, help="whether to show the pose by xtick")
+    args = parser.parse_args()
+
+    # input setting
+    num_cluster = int(args.cluster)
+    artist = args.artist if args.artist else None
+    show_pose = True if args.pose == 'True' else False
+
+    # generate the dentrogram and the detail of clusters
+    generate_dendrogram(artist, show_pose, num_cluster)
