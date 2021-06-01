@@ -67,7 +67,11 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 
 ## Analyze poses
 
-1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder in the root directory of 'pose-analysis', i.e., 'output/data' and 'output/pix';
+1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder in the root directory of 'pose-analysis':
+
+* 'output/data'
+* 'output/pix'
+
 ```bash
 python extract_keypoints_pyopenpose.py --input datasets/
 ```
