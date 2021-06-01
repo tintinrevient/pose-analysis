@@ -67,15 +67,19 @@ python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic
 
 ## Analyze poses
 
-1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder in the root directory of 'pose-analysis', i.e., 'output/data' and 'output/pix';
+1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder in the root directory of 'pose-analysis':
+
+* 'output/data'
+* 'output/pix'
+
 ```bash
 python extract_keypoints_pyopenpose.py --input datasets/
 ```
 
-2. Execute the following command to generate:
+2. Execute the following command to generate the images and the CSV file in the above 'output' folder:
 
-* For each valid person: bbox + normalized pose;
-* For all valid people: angle CSV file to generate the dendrogram later;
+* For each valid person: bbox + normalized pose, i.e., '5184_1.png' + '5184_norm_1.png';
+* For all valid people: angle CSV file, i.e., 'joint_angles.csv', to generate the dendrogram later;
 
 ```bash
 python analyze_keypoints.py --input output/data/
