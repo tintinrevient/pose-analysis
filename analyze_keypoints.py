@@ -379,9 +379,10 @@ if __name__ == '__main__':
 
     # python analyze_keypoints.py --input output/data/
 
+    #  python analyze_keypoints.py --input output/data/classical/El\ Greco/
+
     # python analyze_keypoints.py --input output/data/modern/Felix\ Vallotton/7043_keypoints.npy
     # python analyze_keypoints.py --input output/data/modern/Paul\ Delvaux/81511_keypoints.npy
-    # python analyze_keypoints.py --input output/data/modern/Paul\ Delvaux/74433_keypoints.npy
     # python analyze_keypoints.py --input output/data/classical/Michelangelo/6834_keypoints.npy
 
     parser = argparse.ArgumentParser(description='Extract the angles of keypoints')

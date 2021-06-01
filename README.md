@@ -100,7 +100,7 @@ python hierarchical_clustering.py
 ```
 
 <p float="left">
-    <img src="./pix/dendrogram.png" width=600 />
+    <img src="./pix/dendrogram_Michelangelo.png" width=600 />
 </p>
 
 ## References

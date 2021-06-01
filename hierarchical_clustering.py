@@ -2,9 +2,14 @@ import pandas as pd
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
 import os
+import numpy as np
+from matplotlib.offsetbox import OffsetImage,AnnotationBbox
 
+# input setting
 num_cluster = 5
+category = 'classical'
 artist = 'Michelangelo'
+size = 10
 
 if artist:
     outfile = os.path.join('pix', 'dendrogram{}.png'.format('_' + artist))
@@ -29,14 +34,46 @@ print(Z.shape)
 # plot the dendrogram
 
 if artist:
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(size, 5))
 else:
     fig, ax = plt.subplots(figsize=(30, 5))
 
 
 dendrogram(Z, labels=list(df.index), color_threshold=0)
+
+# xticks
 plt.xticks(rotation=90)
+# ylabel
 ax.set_ylabel('distance')
+
+# show the corresponding images on xticks
+def get_flag(name):
+    name_list = name.split('_')
+    artist = name_list[0]
+    fname = '%s_norm_%s.png' % (name_list[1], name_list[2])
+    path = "output/pix/%s/%s/%s" % (category, artist, fname)
+    im = plt.imread(path)
+    return im
+
+def offset_image(xtick, label, ax):
+    name = label.get_text()
+    img = get_flag(name)
+    im = OffsetImage(img, zoom=0.2)
+    im.image.axes = ax
+
+    ab = AnnotationBbox(im, (xtick, 0),  xybox=(0., -20.), frameon=False,
+                        xycoords='data',  boxcoords="offset points", pad=0)
+
+    ax.add_artist(ab)
+
+xticks = list(ax.get_xticks())
+xticklabels = list(ax.get_xticklabels())
+
+for xtick, label in zip(xticks, xticklabels):
+    offset_image(xtick, label, ax)
+
+# don't show axis
+plt.axis('off')
 
 # save the plot
 plt.savefig(outfile, bbox_inches='tight', pad_inches=0, dpi=227)
