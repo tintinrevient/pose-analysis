@@ -5,7 +5,7 @@
 ### Style over history
 
 <p float="left">
-    <img src="./pix/timeline-top-21-styles.png" width=900 />
+    <img src="./pix/timeline-top-21-styles.png" width=700 />
 </p>
 
 ### Nude paintings over styles
@@ -17,7 +17,7 @@
 ### Nude paintings over artists
 
 <p float="left">
-    <img src="./pix/timeline-top-26-nu-artists.png" width=900 />
+    <img src="./pix/timeline-top-26-nu-artists.png" width=700 />
 </p>
 
 ## Analyze poses
