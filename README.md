@@ -1,18 +1,20 @@
 # Pose Analysis
 
-## Style over history
+## Dataset
+
+### Style over history
 
 <p float="left">
     <img src="./pix/timeline-top-21-styles.png" width=900 />
 </p>
 
-## Nude paintings over styles
+### Nude paintings over styles
 
 <p float="left">
     <img src="./pix/pie-top-16-styles-of-nu.png" width=600 />
 </p>
 
-## Nude paintings over artists
+### Nude paintings over artists
 
 <p float="left">
     <img src="./pix/timeline-top-26-nu-artists.png" width=900 />
@@ -64,7 +66,18 @@ python hierarchical_clustering.py
 
 ### DensePose
 
-https://github.com/tintinrevient/detectron2/tree/main/projects/DensePose
+#### Normalization
+<p float="left">
+    <img src="https://github.com/tintinrevient/detectron2/raw/main/projects/DensePose/pix/densepose-norm.png" width="600"/>
+</p>
+
+#### Elliptical distribution
+<p float="left">
+    <img src="https://github.com/tintinrevient/detectron2/raw/main/projects/DensePose/pix/pose_std0.5_woman.png" width="300"/>
+    <img src="https://github.com/tintinrevient/detectron2/raw/main/projects/DensePose/pix/pose_std0.5_modern.png" width="300"/>
+</p>
+
+The full code and result are in this link: https://github.com/tintinrevient/detectron2/tree/main/projects/DensePose
 
 ## Tools
 
