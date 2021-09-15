@@ -52,7 +52,7 @@ python analyze_keypoints.py --input output/data/
 </p>
 
 <p float="left">
-    <img src="./pix/54409_rendered.png" width=500 />
+    <img src="./pix/54409_rendered.png" width=300 />
 </p>
 
 3. Execute the following command to generate the dendrogram:
