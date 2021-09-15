@@ -18,54 +18,9 @@
     <img src="./pix/timeline-top-26-nu-artists.png" width=900 />
 </p>
 
-## FLIC annotations
-
-<p float="left">
-    <img src="./pix/flic_500.png" width=500 />
-</p>
-
-## Human parsing
-
-```bash
-python demo_human_parsing.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --model models/lip_jppnet_384.pb
-```
-
-<p float="left">
-    <img src="./pix/demo_input.jpg" width=400 />
-    <img src="./pix/demo_human_parsing.png" width=400 />
-</p>
-
-## Openpose
-
-```bash
-python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --proto models/openpose_pose_coco.prototxt --model models/pose_iter_440000.caffemodel --dataset COCO
-```
-
-<p float="left">
-    <img src="./pix/demo_input.jpg" width=400 />
-    <img src="./pix/demo_openpose.png" width=400 />
-</p>
-
-## tf-pose
-
-python 3.6 + tensorflow 1.15 + tf-pose, as tf-pose works only with tensorflow < 2.0
-```bash
-conda create -n py3.6 python=3.6
-conda activate py3.6
-pip install tensorflow==1.15
-pip install tf-pose
-```
-
-```bash
-python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg
-```
-
-<p float="left">
-    <img src="./pix/demo_input.jpg" width=400 />
-    <img src="./pix/demo_tfpose.png" width=400 />
-</p>
-
 ## Analyze poses
+
+### OpenPose
 
 1. In [Openpose](https://github.com/tintinrevient/openpose), execute the following command and copy 'output' folder in the root directory of 'pose-analysis':
 
@@ -105,6 +60,59 @@ python hierarchical_clustering.py
 
 <p float="left">
     <img src="./pix/dendrogram_Michelangelo.png" width=600 />
+</p>
+
+### DensePose
+
+https://github.com/tintinrevient/detectron2/tree/main/projects/DensePose
+
+## Tools
+
+### FLIC annotations
+
+<p float="left">
+    <img src="./pix/flic_500.png" width=500 />
+</p>
+
+### Human parsing
+
+```bash
+python demo_human_parsing.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --model models/lip_jppnet_384.pb
+```
+
+<p float="left">
+    <img src="./pix/demo_input.jpg" width=400 />
+    <img src="./pix/demo_human_parsing.png" width=400 />
+</p>
+
+### Openpose
+
+```bash
+python demo_openpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg --proto models/openpose_pose_coco.prototxt --model models/pose_iter_440000.caffemodel --dataset COCO
+```
+
+<p float="left">
+    <img src="./pix/demo_input.jpg" width=400 />
+    <img src="./pix/demo_openpose.png" width=400 />
+</p>
+
+### tf-pose
+
+python 3.6 + tensorflow 1.15 + tf-pose, as tf-pose works only with tensorflow < 2.0
+```bash
+conda create -n py3.6 python=3.6
+conda activate py3.6
+pip install tensorflow==1.15
+pip install tf-pose
+```
+
+```bash
+python demo_tfpose.py --input dataset/painter-of-modern/Felix\ Vallotton\ /Magic\ Realism/7043.jpg
+```
+
+<p float="left">
+    <img src="./pix/demo_input.jpg" width=400 />
+    <img src="./pix/demo_tfpose.png" width=400 />
 </p>
 
 ## References
